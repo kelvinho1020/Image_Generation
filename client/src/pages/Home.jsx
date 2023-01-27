@@ -10,10 +10,10 @@ const RenderCards = ({data, title}) => {
 }
 
 const Home = () => {
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [allPosts, setAllPosts] = useState(null);
 
-  const [searchText, setsearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   return (
     <section className="max-w-7xl mx-auto">
