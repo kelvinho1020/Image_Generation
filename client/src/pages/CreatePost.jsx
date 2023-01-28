@@ -15,12 +15,55 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  function generateImage(){
+  async function generateImage() {
+    if(form.prompt) {
+      try {
+        setGeneratingImg(true);
+        const response = await fetch('http://localhost:8080/api/v1/dalle', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: form.prompt })
+        });
 
+        const data = await response.json();
+
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}`});
+      } catch(err) {
+        console.log(err);
+      } finally {
+        setGeneratingImg(false);
+      }
+    } else {
+      alert("Please enter a prompt")
+    }
   }
 
-  function handleSubmit(){
+  async function handleSubmit(e) {
+    e.preventDefault();
+    
+    if(form.prompt && form.photo && form.name) {
+      setLoading(true);
+      try {
+        const response = await fetch("http://localhost:8080/api/v1/post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form)
+        })
 
+        await response.json();
+        navigate("/");
+      } catch(err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert("Please enter a the form")
+    }
   }
 
   function handleChange(e) {
@@ -81,7 +124,7 @@ const CreatePost = () => {
               type="button" 
               onClick={generateImage}
             >
-              {generateImage ? "generating..." : "Generate"}
+              {generatingImg ? "generating..." : "Generate"}
             </button>
         </div>
 
