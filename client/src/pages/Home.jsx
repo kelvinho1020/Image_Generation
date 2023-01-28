@@ -1,19 +1,79 @@
-import React, { useState, useEffect } from 'react'
-import { Loader, Card, FormField } from '../components'
-
-const RenderCards = ({data, title}) => {
-  if(data?.length > 0) return data.map((post) => <Card key={post._id} {...post} />)
-
-  return (
-    <h2 className="mt-5 font-bold text-[#6449ff] text-xl uppercase">{title}</h2>
-  )
-}
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { Loader, FormField } from '../components'
+import { RenderCards } from '../components/home'
+import debounce from "lodash/debounce";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
-  const [allPosts, setAllPosts] = useState(null);
+  const [allPosts, setAllPosts] = useState([]);
+  const [postPage, setPostPage] = useState(0);
 
   const [searchText, setSearchText] = useState("");
+  const [searchedresults, setSearchedResults] = useState(null);
+
+  // >>>>>>Post
+  useEffect(() => {
+    console.log("-----useEffect")
+    const fetchPosts = async () => {
+      setLoading(true);
+      
+      try {
+        const response = await fetch(`http://localhost:8080/api/v1/post?p=${postPage}`, {
+          method: "GET",
+          "Content-Type": "application/json"
+        })
+
+        if(response.ok) {
+          const result = await response.json();
+          console.log(result.data)
+          setAllPosts([...allPosts, ...result.data]);
+        }
+      } catch(err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPosts();
+  },[postPage]);
+
+  const loadMorePosts = function() {
+    setPostPage(prev => prev + 1);
+    console.log(postPage)
+  }
+  // <<<<<<Post
+
+  // >>>>>>Search
+  const handleDebounceSearchFn = async function(value) {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8080/api/v1/post?s=${value}`, {
+        method: "GET",
+        "Content-Type": "application/json"
+      })
+
+      if(response.ok) {
+        const result = await response.json();
+        setSearchedResults(result.data);
+      }
+    } catch(err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const debounceSearchFn = useCallback(debounce(handleDebounceSearchFn, 500), []);
+
+  const handleSearchChange = function(e) {
+    console.log("searchChange");
+    setSearchText(e.target.value);
+    if(e.target.value) {
+      debounceSearchFn(e.target.value)
+    }
+  }
+  // <<<<<<Search
 
   return (
     <section className="max-w-7xl mx-auto">
@@ -25,31 +85,39 @@ const Home = () => {
       </div>
 
       <div className="mt-16">
-        <FormField />
+        <FormField 
+          labelName="Search posts"
+          type="text"
+          name="text"
+          placeholder="Search posts"
+          value={searchText}
+          handleChange={handleSearchChange}
+        />
       </div>
 
       <div className="mt-10">
-        {loading ? (
+        {loading && (
           <div className="flex justify-center items-center">
             <Loader />
           </div>
-        ): (
-          <>
-            {searchText && (
-              <h2 className="font-medium text-[#666e75] text-xl mb-3">
-                Showing results for <span className="text-[#222328]">{searchText}</span>
-              </h2>
-            )}
-            <div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
-              {searchText ? (
-                <RenderCards data={[]} title="No search results found" />
-              ): (
-                <RenderCards data={[]} title="No posts found" />
-              )}
-            </div>
-          </>
         )}
+        <>
+          {searchText && (
+            <h2 className="font-medium text-[#666e75] text-xl mb-3">
+              Showing results for <span className="text-[#222328]">{searchText}</span>
+            </h2>
+          )}
+          <div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
+            {searchText ? (
+              <RenderCards data={searchedresults} title="No search results found" />
+            ): (
+              <RenderCards data={allPosts} title="No posts found" />
+            )}
+          </div>
+        </>
       </div>
+
+      <button onClick={loadMorePosts}>Load More</button>
     </section>
   )
 }
