@@ -18,7 +18,7 @@ router.route("/").get(async(req, res) => {
   try {
     console.log("get post");
     const page = req.query.p || 0
-    const postsPerPage = 5;
+    const postsPerPage = 3;
 
     const filterString = req.query.s || "";
 

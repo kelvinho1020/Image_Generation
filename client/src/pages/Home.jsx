@@ -7,6 +7,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
   const [postPage, setPostPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
 
   const [searchText, setSearchText] = useState("");
   const [searchedresults, setSearchedResults] = useState(null);
@@ -16,6 +17,7 @@ const Home = () => {
     console.log("-----useEffect")
     const fetchPosts = async () => {
       setLoading(true);
+      console.log(postPage);
       
       try {
         const response = await fetch(`http://localhost:8080/api/v1/post?p=${postPage}`, {
@@ -27,6 +29,7 @@ const Home = () => {
           const result = await response.json();
           console.log(result.data)
           setAllPosts([...allPosts, ...result.data]);
+          setHasMore(result.data.length > 0)
         }
       } catch(err) {
         console.log(err);
@@ -109,15 +112,25 @@ const Home = () => {
           )}
           <div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
             {searchText ? (
-              <RenderCards data={searchedresults} title="No search results found" />
+              <RenderCards 
+                setPostPage={setPostPage} 
+                hasMore={hasMore} 
+                isLoading={loading} 
+                data={searchedresults} 
+                title="No search results found" 
+              />
             ): (
-              <RenderCards data={allPosts} title="No posts found" />
+              <RenderCards 
+                setPostPage={setPostPage} 
+                hasMore={hasMore} 
+                isLoading={loading} 
+                data={allPosts} 
+                title="No posts found" 
+              />
             )}
           </div>
         </>
       </div>
-
-      <button onClick={loadMorePosts}>Load More</button>
     </section>
   )
 }
