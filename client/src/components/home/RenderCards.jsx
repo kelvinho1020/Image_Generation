@@ -1,7 +1,7 @@
 import { useRef, useCallback } from "react";
 import { Card } from './index.js'
 
-const RenderCards = ({data, title, isLoading, hasMore, setPostPage}) => {
+const RenderCards = ({data, title, isLoading, hasMore, setPostPage, isSearch}) => {
   const observer = useRef();
   const lastPostRef = useCallback(node => {
     if(isLoading) return;
@@ -20,7 +20,7 @@ const RenderCards = ({data, title, isLoading, hasMore, setPostPage}) => {
 
   if(data?.length > 0){
     return data.map((post, index) => {
-      if(data.length === index + 1) {
+      if(data.length === index + 1 && !isSearch) {
         return (<Card innerRef={lastPostRef} key={post._id} {...post} />)
       } else {
         return (<Card key={post._id} {...post} />)

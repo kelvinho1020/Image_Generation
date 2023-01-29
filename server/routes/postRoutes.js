@@ -18,11 +18,10 @@ router.route("/").get(async(req, res) => {
   try {
     console.log("get post");
     const page = req.query.p || 0
-    const postsPerPage = 3;
-
+    const postsPerPage = req.query.s ? 0 : 10;
     const filterString = req.query.s || "";
 
-    const posts = await Post.find({prompt: {$regex : filterString}}).skip(page * postsPerPage).limit(postsPerPage).sort({_id: -1});;
+    const posts = await Post.find({prompt: {$regex : filterString}}).skip(page * postsPerPage).limit(postsPerPage).sort({_id: -1});
 
     res.status(200).json({ success: true, data: posts });
 

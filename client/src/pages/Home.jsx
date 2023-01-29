@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { Loader, FormField } from '../components'
-import { RenderCards } from '../components/home'
-import debounce from "lodash/debounce";
+import React, { useState, useEffect } from 'react'
+import { Loader } from '../components'
+import { RenderCards, SearchBar } from '../components/home'
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +11,6 @@ const Home = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedresults, setSearchedResults] = useState(null);
 
-  // >>>>>>Post
   useEffect(() => {
     console.log("-----useEffect")
     const fetchPosts = async () => {
@@ -41,43 +39,6 @@ const Home = () => {
     fetchPosts();
   },[postPage]);
 
-  const loadMorePosts = function() {
-    setPostPage(prev => prev + 1);
-    console.log(postPage)
-  }
-  // <<<<<<Post
-
-  // >>>>>>Search
-  const handleDebounceSearchFn = async function(value) {
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:8080/api/v1/post?s=${value}`, {
-        method: "GET",
-        "Content-Type": "application/json"
-      })
-
-      if(response.ok) {
-        const result = await response.json();
-        setSearchedResults(result.data);
-      }
-    } catch(err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const debounceSearchFn = useCallback(debounce(handleDebounceSearchFn, 500), []);
-
-  const handleSearchChange = function(e) {
-    console.log("searchChange");
-    setSearchText(e.target.value);
-    if(e.target.value) {
-      debounceSearchFn(e.target.value)
-    }
-  }
-  // <<<<<<Search
-
   return (
     <section className="max-w-7xl mx-auto">
       <div>
@@ -87,16 +48,7 @@ const Home = () => {
         </p>
       </div>
 
-      <div className="mt-16">
-        <FormField 
-          labelName="Search posts"
-          type="text"
-          name="text"
-          placeholder="Search posts"
-          value={searchText}
-          handleChange={handleSearchChange}
-        />
-      </div>
+      <SearchBar setSearchedResults={setSearchedResults} setLoading={setLoading} setSearchText={setSearchText} searchText={searchText} />
 
       <div className="mt-10">
         {loading && (
@@ -113,15 +65,17 @@ const Home = () => {
           <div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
             {searchText ? (
               <RenderCards 
-                setPostPage={setPostPage} 
+                isSearch={true}
+                setPostPage={setPostPage}
                 hasMore={hasMore} 
                 isLoading={loading} 
                 data={searchedresults} 
                 title="No search results found" 
-              />
-            ): (
+                />
+                ): (
               <RenderCards 
-                setPostPage={setPostPage} 
+                isSearch={false}
+                setPostPage={setPostPage}
                 hasMore={hasMore} 
                 isLoading={loading} 
                 data={allPosts} 
