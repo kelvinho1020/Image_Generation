@@ -1,22 +1,18 @@
 import React , {  useCallback } from 'react'
-import FormField from "../FormField"
+import { FormField } from '../../components/common'
 import debounce from "lodash/debounce";
+import { apiGetPost } from "../../api";
 
 const SearchBar = ({setSearchedResults, setLoading, setSearchText, searchText}) => {
     const handleDebounceSearchFn = async function(value) {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/post?s=${value}`, {
-          method: "GET",
-          "Content-Type": "application/json"
-        })
-  
-        if(response.ok) {
-          const result = await response.json();
-          setSearchedResults(result.data);
-        }
+        const response = await apiGetPost(0, value);
+        const result = await response.data.data;
+        setSearchedResults(result);
+
       } catch(err) {
-        console.log(err);
+        console.log(err.message);
       } finally {
         setLoading(false);
       }
@@ -36,7 +32,7 @@ const SearchBar = ({setSearchedResults, setLoading, setSearchText, searchText}) 
     <div className="mt-16">
       <FormField 
         labelName="Search posts"
-        type="text"
+        type="search"
         name="text"
         placeholder="Search posts"
         value={searchText}

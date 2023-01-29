@@ -15,7 +15,6 @@ const RenderCards = ({data, title, isLoading, hasMore, setPostPage, isSearch}) =
     });
 
     if(node) observer.current.observe(node);
-    console.log(node);
   }, [isLoading, hasMore]);
 
   if(data?.length > 0){

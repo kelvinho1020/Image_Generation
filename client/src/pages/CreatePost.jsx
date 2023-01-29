@@ -3,9 +3,13 @@ import { useNavigate } from "react-router-dom"
 
 import { preview } from '../assets';
 import { getRandomPrompt } from '../utils';
-import { FormField, Loader } from '../components'
+import { FormField, Loader } from '../components/common'
+import { apiPostDalle, apiPostPost } from "../api";
+import { useAlert } from 'react-alert'
 
 const CreatePost = () => {
+  const alert = useAlert();
+
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -19,24 +23,17 @@ const CreatePost = () => {
     if(form.prompt) {
       try {
         setGeneratingImg(true);
-        const response = await fetch('http://localhost:8080/api/v1/dalle', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt: form.prompt })
-        });
+        const response = await apiPostDalle({ prompt: form.prompt });
+        const result = response.data;
 
-        const data = await response.json();
-
-        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}`});
+        setForm({ ...form, photo: `data:image/jpeg;base64,${result.photo}`});
       } catch(err) {
-        console.log(err);
+        alert.show(err.message);
       } finally {
         setGeneratingImg(false);
       }
     } else {
-      alert("Please enter a prompt")
+      alert.show('Please enter a Prompt!')
     }
   }
 
@@ -46,23 +43,17 @@ const CreatePost = () => {
     if(form.prompt && form.photo && form.name) {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:8080/api/v1/post", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(form)
-        })
-
-        await response.json();
+        await apiPostPost(form);
+        alert.show("Share successfully!");
+        
         navigate("/");
       } catch(err) {
-        console.log(err);
+        alert.show(err.message);
       } finally {
         setLoading(false);
       }
     } else {
-      alert("Please enter a the form")
+      alert.show('Please generate a image before share it with the community!')
     }
   }
 

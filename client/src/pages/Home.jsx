@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Loader } from '../components'
+import { Loader } from '../components/common'
 import { RenderCards, SearchBar } from '../components/home'
+import { apiGetPost } from "../api"
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -12,25 +13,18 @@ const Home = () => {
   const [searchedresults, setSearchedResults] = useState(null);
 
   useEffect(() => {
-    console.log("-----useEffect")
     const fetchPosts = async () => {
       setLoading(true);
-      console.log(postPage);
       
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/post?p=${postPage}`, {
-          method: "GET",
-          "Content-Type": "application/json"
-        })
+        const response = await apiGetPost(postPage);
+        const result = response.data.data
 
-        if(response.ok) {
-          const result = await response.json();
-          console.log(result.data)
-          setAllPosts([...allPosts, ...result.data]);
-          setHasMore(result.data.length > 0)
-        }
+        setAllPosts([...allPosts, ...result]);
+        setHasMore(result.length > 0)
+
       } catch(err) {
-        console.log(err);
+        console.log(err.message);
       } finally {
         setLoading(false);
       }
@@ -48,7 +42,12 @@ const Home = () => {
         </p>
       </div>
 
-      <SearchBar setSearchedResults={setSearchedResults} setLoading={setLoading} setSearchText={setSearchText} searchText={searchText} />
+      <SearchBar 
+        setSearchedResults={setSearchedResults} 
+        setLoading={setLoading} 
+        setSearchText={setSearchText} 
+        searchText={searchText} 
+      />
 
       <div className="mt-10">
         {loading && (
