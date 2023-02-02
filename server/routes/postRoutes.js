@@ -4,6 +4,12 @@ import { v2 as cloudinary } from 'cloudinary';
 
 import Post from '../mongodb/models/post.js';
 
+import axios from "axios";
+import sharp from "sharp";
+import { encode } from "blurhash";
+
+
+
 dotenv.config();
 
 const router = express.Router();
@@ -23,6 +29,8 @@ router.route("/").get(async(req, res) => {
 
     const posts = await Post.find({prompt: {$regex : filterString}}).skip(page * postsPerPage).limit(postsPerPage).sort({_id: -1});
 
+    console.log(posts);
+
     res.status(200).json({ success: true, data: posts });
 
   } catch(err) {
@@ -34,7 +42,7 @@ router.route("/").get(async(req, res) => {
 
 router.route("/").post(async(req, res) => {
   try {
-    const { name, prompt, photo } = req.body;
+    const { name, prompt, photo, hash } = req.body;
     console.log("post post")
     const photoUrl = await cloudinary.uploader.upload(photo);
     
@@ -42,6 +50,7 @@ router.route("/").post(async(req, res) => {
       name,
       prompt,
       photo: photoUrl.url,
+      hash
     })
     
     res.status(201).json({ success: true, data: newPost });

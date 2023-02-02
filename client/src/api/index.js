@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BASEURL =  (process.env.NODE_ENV === 'development') ? "http://localhost:8080/" : "https://dall-e-2dug.onrender.com";
+const BASEURL =  (process.env.NODE_ENV === 'development') ? "http://localhost:8080/" : "https://dall-e-2dug.onrender.com/";
+// const BASEURL =  "https://dall-e-2dug.onrender.com"
 console.log(BASEURL);
 
 const postRequest = axios.create({
