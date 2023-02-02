@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { preview } from '../assets';
 import { getRandomPrompt } from '../utils';
-import { FormField, Loader } from '../components/common'
+import { FormField, Loader, LoaderFull } from '../components/common'
 import { apiPostDalle, apiPostPost } from "../api";
 import { useAlert } from 'react-alert'
 
@@ -15,18 +15,21 @@ const CreatePost = () => {
     name: "",
     prompt: "",
     photo: "",
+    hash: "",
   })
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function generateImage() {
+  const generateImage = async() => {
     if(form.prompt) {
       try {
         setGeneratingImg(true);
         const response = await apiPostDalle({ prompt: form.prompt });
         const result = response.data;
 
-        setForm({ ...form, photo: `data:image/jpeg;base64,${result.photo}`});
+        console.log(result);
+
+        setForm({ ...form, photo: `data:image/jpeg;base64,${result.photo}`, hash: result.hash});
       } catch(err) {
         alert.show(err.message);
       } finally {
@@ -37,7 +40,7 @@ const CreatePost = () => {
     }
   }
 
-  async function handleSubmit(e) {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     
     if(form.prompt && form.photo && form.name) {
@@ -57,11 +60,11 @@ const CreatePost = () => {
     }
   }
 
-  function handleChange(e) {
+  const handleChange = (e) => {
     setForm({...form, [e.target.name]: e.target.value})
   }
 
-  function handleSurpriseMe() {
+  const handleSurpriseMe = () => {
     const randomPrompt = getRandomPrompt(form.prompt);
     setForm({...form, prompt: randomPrompt});
   }
@@ -94,9 +97,11 @@ const CreatePost = () => {
             isSurpriseMe
             handleSurpriseMe={handleSurpriseMe}
           />
-          <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 p-3 h-64 flex justify-center items-center">
+          <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 h-64 flex justify-center items-center">
             {form.photo ? (
-              <img src={form.photo} alt={form.prompt} className="w-full h-full object-contain" />
+              <>
+                <img src={form.photo} alt={form.prompt} className="w-full h-full object-contain rounded-lg" />
+              </>
             ) : (
               <img src={preview} alt="preview" className="w-9/12 h-9-12 object-contain opacity-40" />
             )}
@@ -128,6 +133,7 @@ const CreatePost = () => {
           {loading ? "Sharing..." : "Share with the community"}
         </button>
       </form>
+      {loading && <LoaderFull />}
     </section>
   )
 }

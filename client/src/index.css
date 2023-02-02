@@ -21,3 +21,7 @@
   background-color: #666e75;
   border-radius: 5px;
 }
+
+.blurhash canvas {
+    border-radius: 0.75rem
+}

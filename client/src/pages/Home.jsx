@@ -50,11 +50,6 @@ const Home = () => {
       />
 
       <div className="mt-10">
-        {loading && (
-          <div className="flex justify-center items-center">
-            <Loader />
-          </div>
-        )}
         <>
           {searchText && (
             <h2 className="font-medium text-[#666e75] text-xl mb-3">
@@ -83,6 +78,11 @@ const Home = () => {
             )}
           </div>
         </>
+        {loading && (
+          <div className="flex justify-center items-center mt-10">
+            <Loader />
+          </div>
+        )}
       </div>
     </section>
   )
