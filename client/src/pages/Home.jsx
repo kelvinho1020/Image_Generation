@@ -23,7 +23,7 @@ const Home = () => {
         result.forEach(post => {
           const url = post.photo;
           let sliceIdx = url.indexOf("upload/");
-          let formattedPhoto = url.substring(0, sliceIdx + 7) + "f_auto/" + url.substring(sliceIdx + 7);
+          let formattedPhoto = url.substring(0, sliceIdx + 7) + "f_webp/" + url.substring(sliceIdx + 7);
 
           post.formattedPhoto = formattedPhoto;
         })
