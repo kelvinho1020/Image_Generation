@@ -18,7 +18,15 @@ const Home = () => {
       
       try {
         const response = await apiGetPost(postPage);
-        const result = response.data.data
+        const result = response.data.data;
+
+        result.forEach(post => {
+          const url = post.photo;
+          let sliceIdx = url.indexOf("upload/");
+          let formattedPhoto = url.substring(0, sliceIdx + 7) + "f_auto/" + url.substring(sliceIdx + 7);
+
+          post.formattedPhoto = formattedPhoto;
+        })
 
         setAllPosts([...allPosts, ...result]);
         setHasMore(result.length > 0)

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Blurhash } from "react-blurhash"
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
-const OptimizedImage = ({photo, hash, _id}) => {
+const OptimizedImage = ({formattedPhoto, hash, _id}) => {
   const [isLoaded, setLoaded] = useState(false);
   const [isLoadStarted, setLoadStarted] = useState(false);
 
@@ -19,7 +19,7 @@ const OptimizedImage = ({photo, hash, _id}) => {
      <LazyLoadImage
         className="w-full h-auto object-cover rounded-xl aspect-square"
         key={_id}
-        src={photo}
+        src={formattedPhoto}
         onLoad={handleLoad}
         beforeLoad={handleLoadStarted}
      />
